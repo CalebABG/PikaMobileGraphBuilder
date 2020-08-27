@@ -1,0 +1,5 @@
+.vs/
+
+# Generated web files
+exported-routes.json
+index.html

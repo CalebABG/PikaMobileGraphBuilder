@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:ios="clr-namespace:Xamarin.Forms.PlatformConfiguration.iOSSpecific;assembly=Xamarin.Forms.Core"
+             xmlns:viewmodels="clr-namespace:CS253ShortestPath.ViewModels"
+             xmlns:ff="clr-namespace:FFImageLoading.Forms;assembly=FFImageLoading.Forms"
+             ios:Page.UseSafeArea="True"
+             mc:Ignorable="d"
+             x:DataType="viewmodels:MainPageViewModel"
+             Title="CS253 Research Project"
+             x:Class="CS253ShortestPath.Pages.MainPage">
+
+    <ContentPage.Content>
+        <Grid BackgroundColor="#A8969F">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <ff:CachedImage
+                Source="https://media.giphy.com/media/CnSn4fwGIrNgQ/giphy.gif"
+                Aspect="AspectFill"
+                DownsampleToViewSize="True"
+                RetryCount="2"
+                RetryDelay="350"
+                BitmapOptimizations="False"
+                DownsampleUseDipUnits="True"
+                CacheDuration="{Binding MainPageImageCacheDuration}" />
+
+            <StackLayout Spacing="18" Margin="15">
+
+                <Button Text="Click to Goto Map!"
+                        IsEnabled="{Binding IsNotBusy}"
+                        TextColor="White"
+                        FontSize="Large"
+                        BackgroundColor="DarkSalmon"
+                        HorizontalOptions="Fill"
+                        VerticalOptions="EndAndExpand"
+                        Margin="30,0"
+                        Command="{Binding CheckPermissionsCommand}" />
+
+            </StackLayout>
+        </Grid>
+
+    </ContentPage.Content>
+</ContentPage>

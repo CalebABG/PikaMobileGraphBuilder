@@ -1,0 +1,322 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:ios="clr-namespace:Xamarin.Forms.PlatformConfiguration.iOSSpecific;assembly=Xamarin.Forms.Core"
+             ios:Page.UseSafeArea="False"
+             xmlns:csresearchmap="clr-namespace:CS253ShortestPath.CustomRenderers"
+             xmlns:pancakeview="clr-namespace:Xamarin.Forms.PancakeView;assembly=Xamarin.Forms.PancakeView"
+             xmlns:viewmodels="clr-namespace:CS253ShortestPath.ViewModels"
+             mc:Ignorable="d"
+             Title="WayPoint Maker!"
+             NavigationPage.HasBackButton="False"
+             x:Class="CS253ShortestPath.Pages.MapToGraph">
+
+    <ContentPage.Resources>
+        <ResourceDictionary />
+    </ContentPage.Resources>
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem x:Name="_toolBarQuitItem" Text="Quit" Order="Primary" />
+    </ContentPage.ToolbarItems>
+
+
+    <ContentPage.Content>
+        <StackLayout x:Name="MyStackLayout" x:DataType="viewmodels:MapToGraphViewModel" BackgroundColor="White">
+            <Grid VerticalOptions="FillAndExpand">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <csresearchmap:ResearchMap
+                    x:Name="MyMap"
+                    VerticalOptions="FillAndExpand"
+                    HasZoomEnabled="True"
+                    IsShowingUser="True"
+                    MapType="Street" />
+
+                <pancakeview:PancakeView x:Name="MyPancakeView"
+                                         CornerRadius="15"
+                                         VerticalOptions="End"
+                                         Elevation="4"
+                                         BackgroundColor="White"
+                                         Margin="{OnPlatform Android='6,40,6,14', iOS='6,40,6,14'}">
+
+                    <pancakeview:PancakeView.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="TogglePancakeView_OnTapped" />
+                    </pancakeview:PancakeView.GestureRecognizers>
+
+                    <StackLayout BackgroundColor="Transparent"
+                                 Spacing="35"
+                                 Padding="12,18">
+
+                        <StackLayout x:Name="ContainerStack" Spacing="18">
+                            <StackLayout Orientation="Horizontal"
+                                         HorizontalOptions="Center"
+                                         Spacing="15">
+
+                                <Label TextColor="Black"
+                                       FontSize="21">
+
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span Text="Points: " />
+                                            <Span Text="{Binding CurrentRoutePoints.Count}" />
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
+
+                                <Label TextColor="Black"
+                                       FontSize="21">
+
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span Text="Routes: " />
+                                            <Span
+                                                Text="{Binding Source={x:Reference MyMap}, 
+                                                                 Path=MapElements.Count}" />
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
+
+                                <StackLayout Orientation="Horizontal" Spacing="5">
+                                    <Label Text="Follow:"
+                                           TextColor="Black" FontSize="21"
+                                           VerticalTextAlignment="Center" />
+
+                                    <Switch
+                                        IsToggled="{Binding Source={x:Reference MyMap}, 
+                                                            Path=CameraFollowsUser}" />
+                                </StackLayout>
+
+                            </StackLayout>
+
+                            <Grid ColumnSpacing="12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+
+                                <!-- Row 0 -->
+                                <Button Grid.Column="0"
+                                        Clicked="AutoAdd_OnClicked"
+                                        Grid.Row="0"
+                                        Text="{Binding AddWayPointsText}"
+                                        TextColor="Black"
+                                        FontSize="17"
+                                        Padding="3"
+                                        BackgroundColor="Gainsboro" />
+
+                                <Button Grid.Column="1"
+                                        Grid.Row="0"
+                                        Clicked="SaveWayPoints_OnClicked"
+                                        Text="Save Markers"
+                                        TextColor="Black"
+                                        FontSize="17"
+                                        Padding="3"
+                                        BackgroundColor="LightGreen" />
+
+                                <Button Grid.Column="0"
+                                        Clicked="ClearMap_OnClicked"
+                                        Grid.Row="1"
+                                        Text="Clear Map"
+                                        TextColor="Black"
+                                        FontSize="17"
+                                        Padding="3"
+                                        BackgroundColor="LightPink" />
+
+                                <Button Grid.Column="1"
+                                        Grid.Row="1"
+                                        Clicked="LoadSavedMarkers_OnClicked"
+                                        Text="Load DB Markers"
+                                        TextColor="Black"
+                                        FontSize="17"
+                                        Padding="3"
+                                        BackgroundColor="LightBlue" />
+
+                            </Grid>
+                        </StackLayout>
+
+                        <StackLayout Spacing="35">
+
+                            <Grid ColumnSpacing="4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+
+                                <!-- Row 0 -->
+                                <Button x:Name="_autoAddWayPointsButton"
+                                        Grid.Column="1"
+                                        Grid.Row="0"
+                                        Text="{Binding AddWayPointsText}"
+                                        TextColor="Black"
+                                        FontSize="14"
+                                        Padding="3"
+                                        BackgroundColor="Gainsboro" />
+
+                                <Button x:Name="_stopTimerButton"
+                                        Grid.Column="2"
+                                        Grid.Row="0"
+                                        Text="Stop Timer"
+                                        TextColor="Black"
+                                        FontSize="14"
+                                        Padding="3"
+                                        BackgroundColor="Gainsboro" />
+
+                                <Button x:Name="_addMarkerButton"
+                                        Grid.Column="0"
+                                        Grid.Row="0"
+                                        Text="Add Marker"
+                                        TextColor="Black"
+                                        FontSize="14"
+                                        BackgroundColor="LightSalmon"
+                                        Padding="3" />
+
+
+                                <!-- Row 1 -->
+                                <Button x:Name="_saveWayPointsButton"
+                                        Grid.Column="1"
+                                        Grid.Row="1"
+                                        Text="Save Markers"
+                                        TextColor="Black"
+                                        FontSize="14"
+                                        Padding="3"
+                                        BackgroundColor="LightGreen" />
+
+                                <Button x:Name="_clearMapButton"
+                                        Grid.Column="0"
+                                        Grid.Row="2"
+                                        Text="Clear Map"
+                                        TextColor="Black"
+                                        FontSize="14"
+                                        Padding="3"
+                                        BackgroundColor="LightPink" />
+
+                                <Button x:Name="_clearSavedWayPointsButton"
+                                        Grid.Column="2"
+                                        Grid.Row="2"
+                                        Text="Clear Db Markers"
+                                        TextColor="Black"
+                                        FontSize="14"
+                                        Padding="3"
+                                        BackgroundColor="LightCoral" />
+
+
+                                <!-- Row 2 -->
+                                <Button x:Name="_clearCurrentWayPointsButton"
+                                        Grid.Column="1"
+                                        Grid.Row="2"
+                                        Text="Clear Current Markers"
+                                        TextColor="Black"
+                                        FontSize="11"
+                                        Padding="3"
+                                        BackgroundColor="Gold" />
+
+                                <Button x:Name="_loadSavedMarkersButton"
+                                        Grid.Column="2"
+                                        Grid.Row="1"
+                                        Text="Load DB Markers"
+                                        TextColor="Black"
+                                        FontSize="12"
+                                        Padding="3"
+                                        BackgroundColor="LightBlue" />
+
+                                <Button x:Name="_reloadCurrentMarkersButton"
+                                        Grid.Column="0"
+                                        Grid.Row="1"
+                                        Text="Load Current Markers"
+                                        TextColor="Black"
+                                        FontSize="11"
+                                        Padding="3"
+                                        BackgroundColor="Gainsboro" />
+
+                                <Button x:Name="_emailGraphButton"
+                                        Grid.Column="0"
+                                        Grid.Row="3"
+                                        Text="Email Graph!"
+                                        TextColor="Black"
+                                        FontSize="11"
+                                        Padding="3"
+                                        BackgroundColor="LightSeaGreen" />
+
+                            </Grid>
+
+                            <StackLayout Orientation="Horizontal" HorizontalOptions="Center"
+                                         Spacing="25">
+
+                                <Grid ColumnSpacing="4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+
+                                    <Label TextColor="Black"
+                                           FontSize="Medium"
+                                           VerticalTextAlignment="Center">
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span Text="Camera Zoom: " />
+                                                <Span
+                                                    Text="{Binding Source={x:Reference MyStepper}, 
+                                                                   Path=Value}" />
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
+
+                                    <Stepper Grid.Row="1"
+                                             x:Name="MyStepper"
+                                             HorizontalOptions="Start"
+                                             Maximum="25"
+                                             Minimum="5"
+                                             Value="{Binding Source={x:Reference MyMap}, 
+                                                             Path=CameraZoom, Mode=TwoWay}" />
+                                </Grid>
+
+                                <StackLayout Spacing="6">
+                                    <Label TextColor="Black"
+                                           FontSize="Medium"
+                                           VerticalTextAlignment="Center">
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span Text="Add Period (sec): " />
+                                                <Span
+                                                    Text="{Binding MarkerDropInterval}" />
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
+
+                                    <Stepper HorizontalOptions="Start"
+                                             Maximum="600"
+                                             Minimum="1"
+                                             Value="{Binding MarkerDropInterval}" />
+                                </StackLayout>
+                            </StackLayout>
+
+                        </StackLayout>
+
+                    </StackLayout>
+                </pancakeview:PancakeView>
+            </Grid>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>
