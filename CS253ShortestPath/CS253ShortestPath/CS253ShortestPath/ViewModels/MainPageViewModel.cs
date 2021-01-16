@@ -20,8 +20,7 @@ namespace CS253ShortestPath.ViewModels
 
         private async Task CheckLocationPermissions()
         {
-            if (IsBusy)
-                return;
+            if (IsBusy) return;
 
             IsBusy = true;
 

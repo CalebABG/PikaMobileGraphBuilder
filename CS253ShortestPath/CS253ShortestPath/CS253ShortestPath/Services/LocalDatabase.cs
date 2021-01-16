@@ -25,6 +25,7 @@ namespace CS253ShortestPath.Services
         private async Task InitializeAsync()
         {
             if (!_initialized)
+            {
                 if (Database.TableMappings.All(m => m.MappedType.Name != typeof(T).Name))
                 {
                     await Database.CreateTablesAsync(CreateFlags.None, typeof(T))
@@ -32,6 +33,7 @@ namespace CS253ShortestPath.Services
 
                     _initialized = true;
                 }
+            }
         }
     }
 }

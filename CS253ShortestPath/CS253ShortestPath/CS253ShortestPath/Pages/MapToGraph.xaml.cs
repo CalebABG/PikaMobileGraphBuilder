@@ -19,8 +19,10 @@ namespace CS253ShortestPath.Pages
     public partial class MapToGraph : ContentPage
     {
         public static DateTimeOffset NextTime;
-        private bool _didLoadEventHandlers;
+
         private Timer? _timer;
+        
+        private bool _loadedEventHandlers;
         private bool _timerStarted;
         private bool _toggleBusy;
 
@@ -183,10 +185,9 @@ namespace CS253ShortestPath.Pages
 
         private async Task LoadRoutes(List<Route> routes)
         {
-            var lines = await GetLinesFromRoute(routes);
-
-            await MainThread.InvokeOnMainThreadAsync(() =>
+            await MainThread.InvokeOnMainThreadAsync(async () =>
             {
+                var lines = await GetLinesFromRoute(routes);
                 foreach (var polyline in lines)
                     MyMap.MapElements.Add(polyline);
             });
@@ -197,12 +198,15 @@ namespace CS253ShortestPath.Pages
             try
             {
                 var currentLocation = CsService.Instance.Location.CurrentLocation;
-
                 if (currentLocation == null)
+                {
                     CrossToastPopUp.Current.ShowToastWarning("Requested Location is currently null");
+                }
                 else
+                {
                     MyMap.MoveToRegion(MapSpan.FromCenterAndRadius(new Position(currentLocation.Latitude,
                         currentLocation.Longitude), Distance.FromMiles(0.2)));
+                }
             }
             catch (Exception e)
             {
@@ -213,10 +217,6 @@ namespace CS253ShortestPath.Pages
         private Task TogglePancakeView()
         {
             var pancakeHeight = MyPancakeView.Height;
-
-            // var stackBottom = MyStackLayout.Bounds.Bottom;
-            // var pancakeTx = MyPancakeView.TranslationX;
-            // var pancakeTy = MyPancakeView.TranslationY;
 
             if (_vm.CanCollapse)
             {
@@ -238,8 +238,7 @@ namespace CS253ShortestPath.Pages
 
         private async Task QuitPage()
         {
-            var ok = await DisplayAlert("Leaving Page",
-                "Do you really want to quit?", "Yes", "Cancel");
+            var ok = await DisplayAlert("Leaving Page", "Do you really want to quit?", "Yes", "Cancel");
 
             if (ok)
             {
@@ -283,7 +282,7 @@ namespace CS253ShortestPath.Pages
 
         private void SubscribeToViewEventHandlers()
         {
-            if (_didLoadEventHandlers) return;
+            if (_loadedEventHandlers) return;
 
             _toolBarQuitItem.Clicked += QuitToolbarItem_Clicked;
             _autoAddWayPointsButton.Clicked += AutoAdd_OnClicked;
@@ -297,12 +296,12 @@ namespace CS253ShortestPath.Pages
             _reloadCurrentMarkersButton.Clicked += ReloadCurrentMarkers_OnClicked;
             _emailGraphButton.Clicked += EmailGraphButtonOnClicked;
 
-            _didLoadEventHandlers = true;
+            _loadedEventHandlers = true;
         }
 
         private void UnSubscribeFromViewEventHandlers()
         {
-            if (!_didLoadEventHandlers) return;
+            if (!_loadedEventHandlers) return;
 
             _toolBarQuitItem.Clicked -= QuitToolbarItem_Clicked;
             _autoAddWayPointsButton.Clicked -= AutoAdd_OnClicked;
@@ -316,7 +315,7 @@ namespace CS253ShortestPath.Pages
             _reloadCurrentMarkersButton.Clicked -= ReloadCurrentMarkers_OnClicked;
             _emailGraphButton.Clicked -= EmailGraphButtonOnClicked;
 
-            _didLoadEventHandlers = false;
+            _loadedEventHandlers = false;
         }
 
         #endregion
@@ -373,6 +372,7 @@ namespace CS253ShortestPath.Pages
             {
                 MyMap.MapElements.Clear();
                 _vm.CurrentRoutePoints.Clear();
+                
                 CrossToastPopUp.Current.ShowToastSuccess("Saved WayPoints!");
             }
 
@@ -432,8 +432,6 @@ namespace CS253ShortestPath.Pages
 
         private async void EmailGraphButtonOnClicked(object sender, EventArgs e)
         {
-            var currentLocation = CsService.Instance.Location.CurrentLocation;
-
             var dbRoutes = await Globals.RouteDatabase.GetDbRoutes();
             if (dbRoutes == null || dbRoutes.Count < 1)
             {
@@ -441,6 +439,7 @@ namespace CS253ShortestPath.Pages
                 return;
             }
 
+            var currentLocation = CsService.Instance.Location.CurrentLocation;
             if (currentLocation == null)
             {
                 CrossToastPopUp.Current.ShowToastMessage("Current Location Null!");
@@ -452,7 +451,6 @@ namespace CS253ShortestPath.Pages
                     currentLocation.Longitude, dbRoutes), Formatting.Indented);
 
             var file = Path.Combine(FileSystem.CacheDirectory, Constants.ExportMarkersJsonFilename);
-
             using (var writer = new StreamWriter(file, false))
             {
                 await writer.WriteAsync(json);
